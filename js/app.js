@@ -15,14 +15,10 @@ var Enemy = function(x,y,speed) {
 // Parameter: dt, a time delta between ticks
 
 Enemy.prototype.update = function(dt) {
-    //console.log(dt + "ssa");
-    this.x+= this.speed;
-    //this.y = this.y + this.speed;
+    this.x+= this.speed *dt;
     if(this.x >= 505){
         this.x = -100;
     }
-    //console.log([this.x,this.y]);
-    return[this.x,this.y];
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
@@ -42,13 +38,6 @@ var Player = function(){
     this.x = 200;
     this.y = 400;
     console.log(this);
-    //var img = document.createElement("img");
-    //img.setAttribute('src',this.sprite);
-    //this.playerDiv = document.getElementById('posOfPlayer');
-    //this.playerDiv.appendChild(img);
-    //this.x = this.playerDiv.offsetLeft;
-    //this.y = this.playerDiv.offsetTop;
-    //console.log(this.x);
     
 }
 
@@ -60,36 +49,38 @@ var bigOO= [{image:'images/char-boy.png',id:'zeroChar'},{image:'images/char-cat-
 
 
 var defaultChar = "images/char-boy.png";
-function addClick(){
+Player.prototype.changeSprite = function(){
     for(let i = 0; i < bigOO.length;i++){
         document.getElementById(bigOO[i].id).addEventListener('click',function(){
             defaultChar = bigOO[i].image;
         })
     }
+    this.sprite = defaultChar;
     return defaultChar;
 }
 
-
-Player.prototype.moo = function(){
-    this.sprite =addClick();
-    
-}
-
 Player.prototype.update =function(){
-    for(enemy of allEnemies){
-         //console.log([[enemy.update()] + "aaa22"])
-        if (enemy.update()[0] == this.x - 40){ 
-            //console.log([[enemy.update()] + "aaa11"])
-            if(enemy.update()[1] == this.y){
-                this.x = 200;
-                this.y = 400;
-                //console.log([enemy.update()] + "aaa00");
+    this.divCong = document.getElementById('cong');
+    this.divWin = document.getElementById('win');
 
-            }
-        }
+    //store player object in cone to use
+    const playerObject = this;
+    if(this.y == -30){
+        this.divCong.classList.remove('temp');
+        //this.divCong.classList.remove('none');
+        this.divCong.style.transition = '2s ease-in';
+        this.divWin.style.transform = 'rotate(360deg)';
+        this.divWin.style.transition = '2s ease-in-out';
     }
-    //console.log([this.x,this.y]);
-    //return [this.x,this.y];
+    document.getElementById('close').addEventListener('click',function(){
+        //console.log(this);//this is HTML object element u can't use it to manipulate attributes of player object
+        playerObject.x = 200;
+        playerObject.y = 400;
+        //document.getElementById('cong').classList.add('none');
+        document.getElementById('cong').classList.add('temp');
+        
+    });
+
 }
 
 
@@ -125,42 +116,18 @@ Player.prototype.handleInput = function(e){
             }
             break;
     }
-    /*if(e === "up"){
-        this.y = this.y - 40;
-        if(this.y < 0){
-            this.y = -30;
-        }
-    }
-    if(e === "down"){
-        this.y = this.y + 40;
-        if(this.y > 400){
-            this.y = 400;
-        }
-    }
-    if(e === "right"){
-        this.x = this.x + 40;
-        if(this.x > 400){
-            this.x = 400;
-        }
-    }
-    if(e === "left"){
-        this.x = this.x - 40;
-        if(this.x < 0){
-            this.x = 0;
-        }
-    }
-*/
+    
 }
 
 Player.prototype.cong=function(){
-    this.divCong = document.getElementById('cong');
+    /*this.divCong = document.getElementById('cong');
     this.divWin = document.getElementById('win');
     if(this.y == -30){
         this.divCong.classList.remove('temp');
         this.divCong.style.transition = '2s ease-in';
         this.divWin.style.transform = 'rotate(360deg)';
         this.divWin.style.transition = '2s ease-in-out';
-    }
+    }*/
 
 }
 
@@ -170,12 +137,13 @@ Player.prototype.cong=function(){
 // Place the player object in a variable called player
 
 const player = new Player();
-const firstEnemy = new Enemy(1,40,1);
-const secondEnemy = new Enemy(1,120,2);
-const thirdEnemy = new Enemy(1,160,5);
-const fourthEnemy = new Enemy(1,200,1)
+const firstEnemy = new Enemy(1,40,200);
+const secondEnemy = new Enemy(1,120,300);
+const thirdEnemy = new Enemy(1,160,800);
+const fourthEnemy = new Enemy(1,200,500);
+const fifthEnemy = new Enemy(1,200,100);
 
-var allEnemies =[firstEnemy,secondEnemy,thirdEnemy,fourthEnemy];
+var allEnemies =[firstEnemy,secondEnemy,thirdEnemy,fourthEnemy,fifthEnemy];
 
 
 // This listens for key presses and sends the keys to your
@@ -192,6 +160,17 @@ document.addEventListener('keyup', function(e) {
 });
 
 
-document.getElementById('close').addEventListener('click',function(){
+/*document.getElementById('close').addEventListener('click',function(){
     document.getElementById('cong').classList.add('none');
-})
+})*/
+
+function checkCollisions(){
+    for(enemy of allEnemies){
+        if (enemy.x >= player.x - 40 && enemy.x <= player.x -10){
+            if(enemy.y == player.y){
+                player.x = 200;
+                player.y = 400;
+            }
+        }
+    }
+}
